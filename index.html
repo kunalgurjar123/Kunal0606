@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mind Reader AI</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: radial-gradient(circle, #000, #050520);
+  color: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+h1 {
+  color: cyan;
+  text-shadow: 0 0 25px cyan;
+  margin-top: 20px;
+}
+
+button {
+  padding: 12px 25px;
+  margin: 10px;
+  border: 2px solid cyan;
+  background: transparent;
+  color: cyan;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: cyan;
+  color: black;
+  box-shadow: 0 0 25px cyan;
+}
+
+.hidden {
+  display: none;
+}
+
+.progress {
+  width: 80%;
+  height: 20px;
+  background: #222;
+  margin: auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, cyan, purple);
+  border-radius: 10px;
+  transition: width 0.2s;
+}
+
+#result {
+  font-size: 26px;
+  margin-top: 20px;
+}
+
+/* glitch effect */
+.glitch {
+  animation: glitch 0.4s infinite;
+}
+
+@keyframes glitch {
+  0% {transform: translate(2px,0);}
+  50% {transform: translate(-2px,0);}
+  100% {transform: translate(2px,0);}
+}
+
+/* fade animation */
+.fade {
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+</style>
+</head>
+
+<body>
+
+<h1>🧠 Mind Reader AI</h1>
+
+<button id="startBtn">Start Game</button>
+
+<div id="game" class="hidden">
+  <p>Think of a number (1–5)</p>
+  <button onclick="startReading()">I Selected</button>
+
+  <div id="loading" class="hidden">
+    <p id="status" class="glitch">Initializing AI...</p>
+    <div class="progress"><div id="bar"></div></div>
+    <p id="percent">0%</p>
+  </div>
+
+  <div id="result" class="hidden fade"></div>
+  <button onclick="restart()">Play Again</button>
+</div>
+
+<script>
+let startBtn = document.getElementById("startBtn");
+let game = document.getElementById("game");
+let loading = document.getElementById("loading");
+let bar = document.getElementById("bar");
+let percent = document.getElementById("percent");
+let result = document.getElementById("result");
+let statusText = document.getElementById("status");
+
+startBtn.onclick = () => {
+  startBtn.style.display = "none";
+  game.classList.remove("hidden");
+};
+
+function startReading() {
+  loading.classList.remove("hidden");
+
+  let width = 0;
+
+  let steps = [
+    "Scanning brain waves...",
+    "Analyzing thoughts...",
+    "Decoding patterns...",
+    "Connecting neural signals...",
+    "Finalizing guess..."
+  ];
+
+  let interval = setInterval(() => {
+    width += Math.random() * 4;
+
+    if (width >= 100) width = 100;
+
+    bar.style.width = width + "%";
+    percent.innerText = Math.floor(width) + "%";
+
+    // change AI messages
+    let stepIndex = Math.floor((width / 100) * steps.length);
+    statusText.innerText = steps[stepIndex] || "Reading mind...";
+
+    if (navigator.vibrate) navigator.vibrate(20);
+
+    if (width >= 100) {
+      clearInterval(interval);
+      setTimeout(showResult, 500);
+    }
+  }, 80);
+}
+
+function showResult() {
+  loading.classList.add("hidden");
+
+  // Slight bias to trick user (illusion of AI)
+  let guess = [1,2,3,4,5][Math.floor(Math.random()*5)];
+  let score = Math.floor(Math.random() * 100);
+
+  result.classList.remove("hidden");
+
+  result.innerHTML =
+    "😱 AI guessed: <b>" + guess + "</b>" +
+    "<br>🔥 Mind Power: <b>" + score + "%</b>";
+
+  let high = localStorage.getItem("highScore") || 0;
+
+  if (score > high) {
+    localStorage.setItem("highScore", score);
+    result.innerHTML += "<br>🏆 New High Score!";
+  } else {
+    result.innerHTML += "<br>High Score: " + high;
+  }
+
+  if (score > 95) {
+    result.innerHTML += "<br>👀 Secret Unlocked!";
+  }
+
+  // simple confetti
+  for (let i = 0; i < 40; i++) {
+    let div = document.createElement("div");
+    div.style.position = "absolute";
+    div.style.width = "6px";
+    div.style.height = "6px";
+    div.style.background = ["cyan","purple","white"][Math.floor(Math.random()*3)];
+    div.style.top = Math.random() * window.innerHeight + "px";
+    div.style.left = Math.random() * window.innerWidth + "px";
+    document.body.appendChild(div);
+  }
+}
+
+function restart() {
+  location.reload();
+}
+</script>
+
+</body>
+</html>
